@@ -35,9 +35,7 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 	else
-	{
-		cout << "socket is OK\n";
-	}
+		cout << "Socket is OK\n";
 
 	//  Connect winth server
 
@@ -52,30 +50,41 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 	else
-	{
 		cout << "Server connect is OK\n";
-	}
 
-	// Messeging to server
+	// Messeging to server and recivig confirmation
 
-	char buffer[300];
+	bool exitTrigger = false;
 
-	cout << "Enter message : ";
-	cin.getline(buffer, 300);
-	int byteCount = send(clientSocket, buffer, 300, 0);
-	if (byteCount > 0)
+	while (exitTrigger == false)
 	{
-		cout << "Send message : " << buffer << endl;
-	}
-	else
-	{
-		WSACleanup();
+		char buffer[300];
+		cout << "Enter message : ";
+		cin.getline(buffer, 300);
+		if (strcmp(buffer, "quit")==0)
+			exitTrigger = true;
+
+		int byteCount = send(clientSocket, buffer, 300, 0);
+		if (byteCount > 0)
+			cout << "Send message : " << buffer << endl;
+		else
+		{
+			cout << "Failed to send message : " << WSAGetLastError() << endl;
+			WSACleanup();
+		}
+
+		byteCount = recv(clientSocket, buffer, 100, 0);
+		if (byteCount > 0)
+			cout << "Server : " << buffer << endl;
+		else
+		{
+			cout << "Failed to recive message : " << WSAGetLastError() << endl;
+			WSACleanup();
+		}
 	}
 
 	// Close sockets
 	system("pause");
 	WSACleanup();
-
-
 }
 
